@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "easyconform"
+version = "0.1.0"
+description = "Calibrated prediction intervals for any scikit-learn-compatible model, in one line, via split conformal prediction."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+authors = [{ name = "Zilin (Daniel) Li" }]
+dependencies = [
+    "numpy>=1.24",
+    "scikit-learn>=1.2",
+]
+
+[project.urls]
+Homepage = "https://github.com/danielwork12121-lab/easyconform"
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4"]
+
+[tool.setuptools]
+packages = ["easyconform"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
