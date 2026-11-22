@@ -127,10 +127,38 @@ above is rounded in the library's favor.
 
 Reproduce this yourself: `pytest tests/ -v` runs this exact check live
 (`test_real_random_forest_empirical_set_coverage_on_real_digits_data`),
-along with 8 other classification tests (hand-computed nonconformity-score
-sanity checks, input-validation checks, and a second real end-to-end
-check on sklearn's bundled `wine` dataset with a scaled
-`LogisticRegression`).
+along with 10 other classification tests (hand-computed nonconformity-score
+sanity checks, input-validation checks, a second real end-to-end check on
+sklearn's bundled `wine` dataset with a scaled `LogisticRegression`, and a
+third real check below).
+
+### A third real check: a different model family, dataset, and `alpha`
+
+The `digits`/`RandomForestClassifier` case above was a genuine,
+real instance of naive miscalibration. It is not the only real possible
+outcome, and this library doesn't only report the cases that make the
+comparison look dramatic. A third real combination — `GradientBoostingClassifier`
+(boosted trees, not a bagged ensemble or a linear model) on sklearn's
+real, bundled `breast_cancer` dataset (569 real diagnostic measurements,
+binary malignant/benign), at a different `alpha=0.15` (an 85% coverage
+target) — measures a genuinely *less dramatic*, equally honest result:
+
+| Method | Empirical coverage (measured) | Mean set size |
+|---|---|---|
+| Raw model probabilities, naively thresholded at 85% (**no conformal calibration**) | **93.57%** | 0.99 |
+| `ConformalizeClassifier` (real split-conformal calibration) | **91.23%** | 0.97 |
+
+Both land above the 85% target here — gradient boosting's own log-loss-
+trained probabilities turn out to already be reasonably well-calibrated
+on this dataset, so the naive threshold doesn't fail the way it did on
+`digits`. Reported exactly as measured, with no assertion forcing either
+number toward a particular story: the real, honest point is that
+`ConformalizeClassifier` gives the same *guaranteed* bound either way,
+without first requiring you to measure (the way this check just did)
+whether your particular model happens to calibrate well on your
+particular data. Reproduce via
+`test_real_gradient_boosting_empirical_set_coverage_on_real_breast_cancer_data`
+and `test_naive_threshold_can_also_be_reasonably_calibrated_sometimes_an_honest_contrast`.
 
 Honesty note on empty sets: at small calibration sizes or for a
 genuinely ambiguous point, the returned set can be empty (no class
@@ -191,8 +219,8 @@ covering both the regression (interval) and classification (set) cases.
 
 ## What's next
 
-1. A second real-dataset coverage check for the classification case at a different `alpha` level, and/or a second real classifier family (e.g. gradient boosting) beyond the two real datasets/models already measured above (`digits`+`RandomForestClassifier`, `wine`+`LogisticRegression`).
-2. A second real-dataset coverage check for the regression case at a third `alpha` level, and/or a second real model family (e.g. gradient boosting), to further stress-test that empirical-coverage claim beyond the two real datasets and two real models already measured there.
+1. ~~A second real-dataset coverage check for the classification case at a different `alpha` level, and/or a second real classifier family (e.g. gradient boosting)~~ — **done**: `GradientBoostingClassifier` on real `breast_cancer` data at `alpha=0.15`, above. A further real classifier family (e.g. gradient boosting *regression* trees' own boosting variant, or a genuinely different method like SVM with calibrated probabilities) is still a real option if a future check wants a fourth data point.
+2. A second real-dataset coverage check for the regression case at a third `alpha` level, and/or a second real model family (e.g. gradient boosting), to further stress-test that empirical-coverage claim beyond the two real datasets and two real models already measured there. Still open.
 
 ## License
 

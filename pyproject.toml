@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "easyconform"
-version = "0.2.0"
+version = "0.2.1"
 description = "Calibrated prediction intervals and prediction sets for any scikit-learn-compatible model, in one line, via split conformal prediction."
 readme = "README.md"
 license = { text = "MIT" }
