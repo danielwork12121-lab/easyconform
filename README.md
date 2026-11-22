@@ -60,9 +60,30 @@ single, almost-certainly-wrong number.
 
 Reproduce this yourself: `pytest tests/ -v` runs this exact check live
 (`test_real_random_forest_empirical_coverage_on_real_california_housing_data`),
-along with 10 other tests (hand-computed quantile-formula sanity checks,
+along with other tests (hand-computed quantile-formula sanity checks,
 input-validation checks, and a second real end-to-end check on sklearn's
 bundled `diabetes` dataset with a plain `LinearRegression`).
+
+### A second real regression check: a different model family, dataset, and `alpha`
+
+The `california_housing`/`RandomForestRegressor` case above is the
+library's flagship check, but `diabetes` had so far only ever been
+exercised for well-formedness (finite, correctly-ordered intervals), never
+for actual measured coverage against a target. A second real combination —
+`GradientBoostingRegressor` (boosted trees, not a bagged ensemble or a
+linear model) on sklearn's real, bundled `diabetes` dataset (442 real
+diabetes-progression measurements), at a different `alpha=0.15` (an 85%
+coverage target, matching the classification suite's own third check) —
+closes that gap:
+
+| Target coverage (`1 - alpha`) | Empirical coverage (measured) | Median interval width |
+|---|---|---|
+| 85% (`alpha=0.15`) | **86.49%** | 179.8 (raw target units) |
+
+Measured on a real, held-out test split of 111 points never seen during
+training or calibration — reported exactly as measured, landing a bit
+above the 85% target rather than forced to it. Reproduce via
+`test_real_gradient_boosting_empirical_coverage_on_real_diabetes_data_at_alpha_0_15`.
 
 ## The one real assumption this relies on
 
@@ -220,7 +241,7 @@ covering both the regression (interval) and classification (set) cases.
 ## What's next
 
 1. ~~A second real-dataset coverage check for the classification case at a different `alpha` level, and/or a second real classifier family (e.g. gradient boosting)~~ — **done**: `GradientBoostingClassifier` on real `breast_cancer` data at `alpha=0.15`, above. A further real classifier family (e.g. gradient boosting *regression* trees' own boosting variant, or a genuinely different method like SVM with calibrated probabilities) is still a real option if a future check wants a fourth data point.
-2. A second real-dataset coverage check for the regression case at a third `alpha` level, and/or a second real model family (e.g. gradient boosting), to further stress-test that empirical-coverage claim beyond the two real datasets and two real models already measured there. Still open.
+2. ~~A second real-dataset coverage check for the regression case at a third `alpha` level, and/or a second real model family (e.g. gradient boosting)~~ — **done**: `GradientBoostingRegressor` on real `diabetes` data at `alpha=0.15`, above. A further real regression model family (e.g. SVR, or a genuinely different method) is still a real option if a future check wants a fourth data point.
 
 ## License
 
