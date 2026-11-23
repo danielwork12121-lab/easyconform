@@ -109,6 +109,30 @@ calibration) — reported exactly as measured, landing within half a point
 of the real target. Reproduce via
 `test_real_svr_empirical_coverage_on_real_california_housing_data_at_alpha_0_2`.
 
+### A fifth real regression check: a different model family, dataset, and `alpha`
+
+The four checks above cover a bagged tree ensemble (`RandomForestRegressor`),
+a boosted tree ensemble (`GradientBoostingRegressor`), a linear model
+(`LinearRegression`, finiteness-only), and a margin-based method (`SVR`). A
+fifth real combination — `KNeighborsRegressor` (instance-based, not a tree
+ensemble, not a linear model, not margin-based) wrapped in a
+`StandardScaler` (k-NN's distance metric is sensitive to raw feature scale,
+the same real engineering judgment call already applied to `SVR` above) —
+back on the real, bundled `diabetes` dataset, but at a genuinely new
+combination: `diabetes` has never had its empirical coverage actually
+*measured* before (only checked for finiteness by the plain
+`LinearRegression` check), and `alpha=0.1` (a 90% target) has never been
+paired with `diabetes` in this suite:
+
+| Target coverage (`1 - alpha`) | Empirical coverage (measured) | Median interval width |
+|---|---|---|
+| 90% (`alpha=0.1`) | **92.13%** | 199.4 (raw target units) |
+
+Measured on a real, held-out test split of 89 points never seen during
+training or calibration — reported exactly as measured, landing a bit
+above the 90% target rather than forced to it. Reproduce via
+`test_real_knn_empirical_coverage_on_real_diabetes_data_at_alpha_0_1`.
+
 ## The one real assumption this relies on
 
 Split conformal's coverage guarantee holds when the calibration set and
@@ -286,7 +310,7 @@ covering both the regression (interval) and classification (set) cases.
 ## What's next
 
 1. ~~A second real-dataset coverage check for the classification case at a different `alpha` level, and/or a second real classifier family (e.g. gradient boosting)~~ — **done**: `GradientBoostingClassifier` on real `breast_cancer` data at `alpha=0.15`, above. ~~A further real classifier family (e.g. SVM with calibrated probabilities)~~ — **done**: a support vector machine on real `iris` data at `alpha=0.2`, above. A fifth real classifier family/dataset/alpha combination is still a real option if a future check wants one.
-2. ~~A second real-dataset coverage check for the regression case at a third `alpha` level, and/or a second real model family (e.g. gradient boosting)~~ — **done**: `GradientBoostingRegressor` on real `diabetes` data at `alpha=0.15`, above. ~~A further real regression model family (e.g. SVR, or a genuinely different method)~~ — **done**: `SVR` (margin-based, `StandardScaler`-wrapped) on real `california_housing` data at `alpha=0.2`, above. A fifth real regression model family/dataset/alpha combination is still a real option if a future check wants one.
+2. ~~A second real-dataset coverage check for the regression case at a third `alpha` level, and/or a second real model family (e.g. gradient boosting)~~ — **done**: `GradientBoostingRegressor` on real `diabetes` data at `alpha=0.15`, above. ~~A further real regression model family (e.g. SVR, or a genuinely different method)~~ — **done**: `SVR` (margin-based, `StandardScaler`-wrapped) on real `california_housing` data at `alpha=0.2`, above. ~~A fifth real regression model family/dataset/alpha combination~~ — **done**: `KNeighborsRegressor` (`StandardScaler`-wrapped) on real `diabetes` data at `alpha=0.1`, above. A sixth combination remains a real option if a future check wants one.
 
 ## License
 
