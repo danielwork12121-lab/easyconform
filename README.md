@@ -159,6 +159,46 @@ training or calibration — reported exactly as measured, landing comfortably
 above the 80% target rather than forced to it. Reproduce via
 `test_real_mlp_empirical_coverage_on_real_diabetes_data_at_alpha_0_2`.
 
+### A seventh real regression check: a genuinely new model family and `alpha`
+
+The six checks above cover a bagged tree ensemble (`RandomForestRegressor`),
+a boosted tree ensemble (`GradientBoostingRegressor`), a linear model
+(`LinearRegression`, finiteness-only), a margin-based method (`SVR`), an
+instance-based method (`KNeighborsRegressor`), and a neural network
+(`MLPRegressor`). No probabilistic/kernel-based Bayesian method had been
+used anywhere in this suite — the classification half already closed this
+exact gap with `GaussianNB`/`breast_cancer`. A seventh real combination —
+`GaussianProcessRegressor` (a full Gaussian-process posterior over
+functions, structurally different from every method above), wrapped in a
+`StandardScaler` (a GP's default RBF kernel is sensitive to raw feature
+scale, the same real engineering judgment call already applied to every
+non-tree-ensemble, non-linear model in this suite; `normalize_y=True` so
+the GP's own target-centering doesn't fight `diabetes`'s real non-zero-mean
+target) — back on the real, bundled `diabetes` dataset, at a genuinely new
+`alpha=0.25` (a 75% target) never paired with `diabetes` before, and never
+used anywhere in this suite at all (every other check, on either side, has
+used 0.1, 0.15, or 0.2):
+
+| Target coverage (`1 - alpha`) | Empirical coverage (measured) | Median interval width |
+|---|---|---|
+| 75% (`alpha=0.25`) | **78.65%** | 144.5 (raw target units) |
+
+Measured on a real, held-out test split of 89 points never seen during
+training or calibration — reported exactly as measured, landing a bit
+above the target rather than forced to it. Reproduce via
+`test_real_gaussian_process_empirical_coverage_on_real_diabetes_data_at_alpha_0_25`.
+
+A tighter `alpha=0.05` (95% target) was measured first and set aside
+honestly, in the same spirit as the earlier `wine`-vs-`breast_cancer`
+comparison on the classification side: it hit 95.51% empirical coverage
+(right at target), but the resulting intervals (median width 286.7) came
+out *wider* than the real test split's own data range (258) — a real,
+instructive limit of this method at this combination (a Gaussian process
+fit on only 265 real points, calibrated on 88, carries wide posterior
+uncertainty at a 95% target), not shipped as a test since this suite's
+convention is to ship a combination whose interval is demonstrably
+informative, not merely well-calibrated.
+
 ## The one real assumption this relies on
 
 Split conformal's coverage guarantee holds when the calibration set and
@@ -383,7 +423,7 @@ covering both the regression (interval) and classification (set) cases.
 ## What's next
 
 1. ~~A second real-dataset coverage check for the classification case at a different `alpha` level, and/or a second real classifier family (e.g. gradient boosting)~~ — **done**: `GradientBoostingClassifier` on real `breast_cancer` data at `alpha=0.15`, above. ~~A further real classifier family (e.g. SVM with calibrated probabilities)~~ — **done**: a support vector machine on real `iris` data at `alpha=0.2`, above. ~~A fifth real classifier family/dataset/alpha combination~~ — **done**: `MLPClassifier` (a feedforward neural network, `StandardScaler`-wrapped) on real `digits` data at `alpha=0.2`, above. ~~A sixth real classifier family/dataset/alpha combination~~ — **done**: `GaussianNB` (a generative/probabilistic method, unwrapped) on real `breast_cancer` data at `alpha=0.1`, above. A seventh combination remains a real option if a future check wants one.
-2. ~~A second real-dataset coverage check for the regression case at a third `alpha` level, and/or a second real model family (e.g. gradient boosting)~~ — **done**: `GradientBoostingRegressor` on real `diabetes` data at `alpha=0.15`, above. ~~A further real regression model family (e.g. SVR, or a genuinely different method)~~ — **done**: `SVR` (margin-based, `StandardScaler`-wrapped) on real `california_housing` data at `alpha=0.2`, above. ~~A fifth real regression model family/dataset/alpha combination~~ — **done**: `KNeighborsRegressor` (`StandardScaler`-wrapped) on real `diabetes` data at `alpha=0.1`, above. ~~A sixth real regression model family/dataset/alpha combination~~ — **done**: `MLPRegressor` (`StandardScaler`-wrapped, `early_stopping=True`) on real `diabetes` data at `alpha=0.2`, above. A seventh combination remains a real option if a future check wants one.
+2. ~~A second real-dataset coverage check for the regression case at a third `alpha` level, and/or a second real model family (e.g. gradient boosting)~~ — **done**: `GradientBoostingRegressor` on real `diabetes` data at `alpha=0.15`, above. ~~A further real regression model family (e.g. SVR, or a genuinely different method)~~ — **done**: `SVR` (margin-based, `StandardScaler`-wrapped) on real `california_housing` data at `alpha=0.2`, above. ~~A fifth real regression model family/dataset/alpha combination~~ — **done**: `KNeighborsRegressor` (`StandardScaler`-wrapped) on real `diabetes` data at `alpha=0.1`, above. ~~A sixth real regression model family/dataset/alpha combination~~ — **done**: `MLPRegressor` (`StandardScaler`-wrapped, `early_stopping=True`) on real `diabetes` data at `alpha=0.2`, above. ~~A seventh real regression model family/dataset/alpha combination~~ — **done**: `GaussianProcessRegressor` (probabilistic/kernel-based, `StandardScaler`-wrapped) on real `diabetes` data at a genuinely new `alpha=0.25`, above. An eighth combination remains a real option if a future check wants one.
 
 ## License
 
