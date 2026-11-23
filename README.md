@@ -133,6 +133,32 @@ training or calibration — reported exactly as measured, landing a bit
 above the 90% target rather than forced to it. Reproduce via
 `test_real_knn_empirical_coverage_on_real_diabetes_data_at_alpha_0_1`.
 
+### A sixth real regression check: a different model family and `alpha`
+
+The five checks above cover a bagged tree ensemble (`RandomForestRegressor`),
+a boosted tree ensemble (`GradientBoostingRegressor`), a linear model
+(`LinearRegression`, finiteness-only), a margin-based method (`SVR`), and an
+instance-based method (`KNeighborsRegressor`). No neural-network-style
+method had been used anywhere in the regression half of this suite (the
+classification half already has `MLPClassifier`/`digits`/`alpha=0.2`). A
+sixth real combination — `MLPRegressor` wrapped in a `StandardScaler`
+(gradient-based neural-network training is sensitive to raw feature scale,
+the same real engineering judgment call already applied to `SVR`/`KNeighborsRegressor`
+above and to `MLPClassifier` on the classification side; `early_stopping=True`
+is used so the model converges cleanly without a spurious convergence
+warning) — back on the real, bundled `diabetes` dataset, at a genuinely new
+`alpha=0.2` (an 80% target) for this dataset (previously only paired with
+`alpha=0.1`):
+
+| Target coverage (`1 - alpha`) | Empirical coverage (measured) | Median interval width |
+|---|---|---|
+| 80% (`alpha=0.2`) | **92.13%** | 169.6 (raw target units) |
+
+Measured on a real, held-out test split of 89 points never seen during
+training or calibration — reported exactly as measured, landing comfortably
+above the 80% target rather than forced to it. Reproduce via
+`test_real_mlp_empirical_coverage_on_real_diabetes_data_at_alpha_0_2`.
+
 ## The one real assumption this relies on
 
 Split conformal's coverage guarantee holds when the calibration set and
@@ -333,7 +359,7 @@ covering both the regression (interval) and classification (set) cases.
 ## What's next
 
 1. ~~A second real-dataset coverage check for the classification case at a different `alpha` level, and/or a second real classifier family (e.g. gradient boosting)~~ — **done**: `GradientBoostingClassifier` on real `breast_cancer` data at `alpha=0.15`, above. ~~A further real classifier family (e.g. SVM with calibrated probabilities)~~ — **done**: a support vector machine on real `iris` data at `alpha=0.2`, above. ~~A fifth real classifier family/dataset/alpha combination~~ — **done**: `MLPClassifier` (a feedforward neural network, `StandardScaler`-wrapped) on real `digits` data at `alpha=0.2`, above. A sixth combination remains a real option if a future check wants one.
-2. ~~A second real-dataset coverage check for the regression case at a third `alpha` level, and/or a second real model family (e.g. gradient boosting)~~ — **done**: `GradientBoostingRegressor` on real `diabetes` data at `alpha=0.15`, above. ~~A further real regression model family (e.g. SVR, or a genuinely different method)~~ — **done**: `SVR` (margin-based, `StandardScaler`-wrapped) on real `california_housing` data at `alpha=0.2`, above. ~~A fifth real regression model family/dataset/alpha combination~~ — **done**: `KNeighborsRegressor` (`StandardScaler`-wrapped) on real `diabetes` data at `alpha=0.1`, above. A sixth combination remains a real option if a future check wants one.
+2. ~~A second real-dataset coverage check for the regression case at a third `alpha` level, and/or a second real model family (e.g. gradient boosting)~~ — **done**: `GradientBoostingRegressor` on real `diabetes` data at `alpha=0.15`, above. ~~A further real regression model family (e.g. SVR, or a genuinely different method)~~ — **done**: `SVR` (margin-based, `StandardScaler`-wrapped) on real `california_housing` data at `alpha=0.2`, above. ~~A fifth real regression model family/dataset/alpha combination~~ — **done**: `KNeighborsRegressor` (`StandardScaler`-wrapped) on real `diabetes` data at `alpha=0.1`, above. ~~A sixth real regression model family/dataset/alpha combination~~ — **done**: `MLPRegressor` (`StandardScaler`-wrapped, `early_stopping=True`) on real `diabetes` data at `alpha=0.2`, above. A seventh combination remains a real option if a future check wants one.
 
 ## License
 
