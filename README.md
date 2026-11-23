@@ -370,6 +370,37 @@ feature's own per-class Gaussian independently) and exposes a real
 `predict_proba` natively, so it's used directly, unwrapped. Reproduce via
 `test_real_gaussian_nb_empirical_set_coverage_on_real_breast_cancer_data_at_alpha_0_1`.
 
+### A seventh real check: a genuinely new model family, and `wine`'s first real quantitative coverage measurement
+
+A seventh real combination — `KNeighborsClassifier` (instance-based,
+voting among the nearest real neighbors in feature space — not a tree
+ensemble, a linear model, a margin-based method, a neural network, or a
+generative probabilistic method, every family this suite's classification
+half has used so far), mirroring `KNeighborsRegressor`'s own role on the
+regression side and closing the matching gap here. Measured on sklearn's
+real, bundled `wine` dataset (178 real chemical-analysis measurements,
+three real cultivar classes) at `alpha=0.2` (an 80% coverage target) —
+`wine`'s first real *quantitative* coverage measurement in this README:
+the existing `wine` check above only confirms the returned sets are
+well-formed, it never measures a real coverage number against a target.
+Measured on 54 real held-out test points:
+
+| Target coverage (`1 - alpha`) | Empirical coverage (measured) |
+|---|---|
+| 80% (`alpha=0.2`) | **90.74%** |
+
+Landing well above the nominal target — not forced, and an honest,
+instructive result in its own right: `wine` is a small, highly separable
+dataset (this same real model's own raw top-1 accuracy on this split is
+98.15%), so most conformal sets here are already singleton and correct,
+leaving the conformal wrapper's own calibration band less binding than it
+is on a harder dataset (contrast the `digits`/`breast_cancer` checks
+above). Wrapped in `make_pipeline(StandardScaler(), KNeighborsClassifier())`
+— distance-based voting is sensitive to raw feature scale, the same real
+engineering judgment call already applied to every non-tree-ensemble,
+non-linear model in this suite. Reproduce via
+`test_real_knn_empirical_set_coverage_on_real_wine_data_at_alpha_0_2`.
+
 ## Installation
 
 Not yet published to PyPI. Until then:
@@ -422,7 +453,7 @@ covering both the regression (interval) and classification (set) cases.
 
 ## What's next
 
-1. ~~A second real-dataset coverage check for the classification case at a different `alpha` level, and/or a second real classifier family (e.g. gradient boosting)~~ — **done**: `GradientBoostingClassifier` on real `breast_cancer` data at `alpha=0.15`, above. ~~A further real classifier family (e.g. SVM with calibrated probabilities)~~ — **done**: a support vector machine on real `iris` data at `alpha=0.2`, above. ~~A fifth real classifier family/dataset/alpha combination~~ — **done**: `MLPClassifier` (a feedforward neural network, `StandardScaler`-wrapped) on real `digits` data at `alpha=0.2`, above. ~~A sixth real classifier family/dataset/alpha combination~~ — **done**: `GaussianNB` (a generative/probabilistic method, unwrapped) on real `breast_cancer` data at `alpha=0.1`, above. A seventh combination remains a real option if a future check wants one.
+1. ~~A second real-dataset coverage check for the classification case at a different `alpha` level, and/or a second real classifier family (e.g. gradient boosting)~~ — **done**: `GradientBoostingClassifier` on real `breast_cancer` data at `alpha=0.15`, above. ~~A further real classifier family (e.g. SVM with calibrated probabilities)~~ — **done**: a support vector machine on real `iris` data at `alpha=0.2`, above. ~~A fifth real classifier family/dataset/alpha combination~~ — **done**: `MLPClassifier` (a feedforward neural network, `StandardScaler`-wrapped) on real `digits` data at `alpha=0.2`, above. ~~A sixth real classifier family/dataset/alpha combination~~ — **done**: `GaussianNB` (a generative/probabilistic method, unwrapped) on real `breast_cancer` data at `alpha=0.1`, above. ~~A seventh real classifier family/dataset/alpha combination~~ — **done**: `KNeighborsClassifier` (`StandardScaler`-wrapped) on real `wine` data at `alpha=0.2` — `wine`'s first real quantitative coverage measurement, above. An eighth combination remains a real option if a future check wants one.
 2. ~~A second real-dataset coverage check for the regression case at a third `alpha` level, and/or a second real model family (e.g. gradient boosting)~~ — **done**: `GradientBoostingRegressor` on real `diabetes` data at `alpha=0.15`, above. ~~A further real regression model family (e.g. SVR, or a genuinely different method)~~ — **done**: `SVR` (margin-based, `StandardScaler`-wrapped) on real `california_housing` data at `alpha=0.2`, above. ~~A fifth real regression model family/dataset/alpha combination~~ — **done**: `KNeighborsRegressor` (`StandardScaler`-wrapped) on real `diabetes` data at `alpha=0.1`, above. ~~A sixth real regression model family/dataset/alpha combination~~ — **done**: `MLPRegressor` (`StandardScaler`-wrapped, `early_stopping=True`) on real `diabetes` data at `alpha=0.2`, above. ~~A seventh real regression model family/dataset/alpha combination~~ — **done**: `GaussianProcessRegressor` (probabilistic/kernel-based, `StandardScaler`-wrapped) on real `diabetes` data at a genuinely new `alpha=0.25`, above. An eighth combination remains a real option if a future check wants one.
 
 ## License
