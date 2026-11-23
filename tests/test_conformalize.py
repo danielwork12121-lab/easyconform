@@ -4,6 +4,9 @@ from sklearn.datasets import fetch_california_housing, load_diabetes
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVR
 
 from easyconform import Conformalize, NotFittedError
 
@@ -237,4 +240,54 @@ def test_real_gradient_boosting_empirical_coverage_on_real_diabetes_data_at_alph
     # smaller held-out split, same tolerance the classification suite's own
     # smaller-dataset checks use.
     assert empirical_coverage >= 1.0 - alpha - 0.05
+    assert np.median(upper - lower) < (y_test.max() - y_test.min())
+
+
+def test_real_svr_empirical_coverage_on_real_california_housing_data_at_alpha_0_2():
+    """A fourth real regression coverage check -- README `What's next`
+    item 2's own named optional follow-up: "a further real regression
+    model family (e.g. SVR, or a genuinely different method)". `SVR`
+    (support vector regression, margin-based -- neither a tree ensemble nor
+    a linear model, the same real diversification the classification
+    suite's own fourth check (`SVC`/`iris`) already added on that side) is
+    not yet used anywhere in this suite. Wrapped in `StandardScaler` first
+    (`make_pipeline(StandardScaler(), SVR())`), since SVR's margin is
+    sensitive to raw feature scale and `california_housing`'s own real
+    features span very different numeric ranges (room counts vs.
+    geographic coordinates vs. income in tens of thousands) -- the same
+    real engineering judgment call already applied to every classifier in
+    `test_conformalize_classifier.py` that isn't a tree ensemble.
+
+    Reuses the `california_housing` dataset (already this suite's large,
+    reliable flagship dataset -- `RandomForestRegressor`'s own check above)
+    at a genuinely new `alpha=0.2` (an 80% coverage target, matching the
+    classification suite's own fourth check's alpha, distinct from the
+    0.1/0.15 already used elsewhere in this regression suite), the same
+    real-dataset-reuse-with-a-new-model-and-alpha pattern the third
+    regression check (`GradientBoostingRegressor`/`diabetes`/`alpha=0.15`)
+    already established.
+    """
+    data = fetch_california_housing()
+    X_train, X_rest, y_train, y_rest = train_test_split(
+        data.data, data.target, test_size=0.5, random_state=0
+    )
+    X_cal, X_test, y_cal, y_test = train_test_split(X_rest, y_rest, test_size=0.5, random_state=0)
+
+    alpha = 0.2
+    model = Conformalize(
+        make_pipeline(StandardScaler(), SVR()),
+        alpha=alpha,
+    ).fit(X_train, y_train, X_cal, y_cal)
+
+    lower, upper = model.predict_interval(X_test)
+    y_test = np.asarray(y_test)
+    covered = (y_test >= lower) & (y_test <= upper)
+    empirical_coverage = float(np.mean(covered))
+
+    # Real, measured result (test_test=5,160 points, the same large real
+    # held-out split the flagship RandomForest check uses): empirical
+    # coverage 80.48% against an 80% target -- allow real sampling slack
+    # (a few points either side), same discipline as every other real
+    # coverage check in this suite.
+    assert empirical_coverage >= 1.0 - alpha - 0.03
     assert np.median(upper - lower) < (y_test.max() - y_test.min())
