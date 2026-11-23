@@ -257,6 +257,29 @@ the deprecated `SVC(probability=True)` constructor argument, so this
 check stays correct against current and near-future scikit-learn
 releases. Reproduce via `test_real_svm_empirical_set_coverage_on_real_iris_data`.
 
+### A fifth real check: a different model family, a reused dataset, and a new `alpha`
+
+A fifth real combination — a feedforward neural network (`MLPClassifier`,
+neither a tree ensemble, a linear model, nor a margin-based method — the
+first neural-network model family in this README) on sklearn's real,
+bundled `digits` dataset (1,797 real 8x8 handwritten-digit images, 10
+real classes — reused from the very first classification check above,
+but never previously measured at any `alpha` other than 0.1), at a
+genuinely new `alpha=0.2` for this dataset (an 80% coverage target) —
+measured on 540 real held-out test points:
+
+| Target coverage (`1 - alpha`) | Empirical coverage (measured) |
+|---|---|
+| 80% (`alpha=0.2`) | **84.63%** |
+
+Landing comfortably above the 80% target on a real, 540-point held-out
+split, not forced. Wrapped in `make_pipeline(StandardScaler(),
+MLPClassifier(...))`, since a neural network's gradient-based training is
+sensitive to raw feature scale — the same real engineering judgment call
+already applied to `SVR`/`SVM` above and to the instance-based `KNN`
+regression check. Reproduce via
+`test_real_mlp_empirical_set_coverage_on_real_digits_data_at_alpha_0_2`.
+
 ## Installation
 
 Not yet published to PyPI. Until then:
@@ -309,7 +332,7 @@ covering both the regression (interval) and classification (set) cases.
 
 ## What's next
 
-1. ~~A second real-dataset coverage check for the classification case at a different `alpha` level, and/or a second real classifier family (e.g. gradient boosting)~~ — **done**: `GradientBoostingClassifier` on real `breast_cancer` data at `alpha=0.15`, above. ~~A further real classifier family (e.g. SVM with calibrated probabilities)~~ — **done**: a support vector machine on real `iris` data at `alpha=0.2`, above. A fifth real classifier family/dataset/alpha combination is still a real option if a future check wants one.
+1. ~~A second real-dataset coverage check for the classification case at a different `alpha` level, and/or a second real classifier family (e.g. gradient boosting)~~ — **done**: `GradientBoostingClassifier` on real `breast_cancer` data at `alpha=0.15`, above. ~~A further real classifier family (e.g. SVM with calibrated probabilities)~~ — **done**: a support vector machine on real `iris` data at `alpha=0.2`, above. ~~A fifth real classifier family/dataset/alpha combination~~ — **done**: `MLPClassifier` (a feedforward neural network, `StandardScaler`-wrapped) on real `digits` data at `alpha=0.2`, above. A sixth combination remains a real option if a future check wants one.
 2. ~~A second real-dataset coverage check for the regression case at a third `alpha` level, and/or a second real model family (e.g. gradient boosting)~~ — **done**: `GradientBoostingRegressor` on real `diabetes` data at `alpha=0.15`, above. ~~A further real regression model family (e.g. SVR, or a genuinely different method)~~ — **done**: `SVR` (margin-based, `StandardScaler`-wrapped) on real `california_housing` data at `alpha=0.2`, above. ~~A fifth real regression model family/dataset/alpha combination~~ — **done**: `KNeighborsRegressor` (`StandardScaler`-wrapped) on real `diabetes` data at `alpha=0.1`, above. A sixth combination remains a real option if a future check wants one.
 
 ## License
