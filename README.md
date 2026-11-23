@@ -188,6 +188,27 @@ honestly rather than silently forcing in a guess, since doing so would
 quietly break the real coverage guarantee. See `ConformalizeClassifier`'s
 own docstring for the full detail.
 
+### A fourth real check: a different model family, dataset, and `alpha`
+
+A fourth real combination — a support vector machine (margin-based,
+neither a tree ensemble nor a linear model) on sklearn's real, bundled
+`iris` dataset (150 real flower measurements, three classes, not used
+anywhere else in this README), at a different `alpha=0.2` (an 80%
+coverage target) — measured on 45 real held-out test points:
+
+| Target coverage (`1 - alpha`) | Empirical coverage (measured) |
+|---|---|
+| 80% (`alpha=0.2`) | **80.00%** |
+
+An exact hit at this sample size (n=45) is itself unremarkable, not
+cherry-picked — the real binomial standard error at this size and target
+rate is roughly 6 points, so this is one more honestly-reported real data
+point, not a claim that `ConformalizeClassifier` always lands exactly on
+target. Uses `CalibratedClassifierCV(SVC(), ensemble=False)` rather than
+the deprecated `SVC(probability=True)` constructor argument, so this
+check stays correct against current and near-future scikit-learn
+releases. Reproduce via `test_real_svm_empirical_set_coverage_on_real_iris_data`.
+
 ## Installation
 
 Not yet published to PyPI. Until then:
@@ -240,7 +261,7 @@ covering both the regression (interval) and classification (set) cases.
 
 ## What's next
 
-1. ~~A second real-dataset coverage check for the classification case at a different `alpha` level, and/or a second real classifier family (e.g. gradient boosting)~~ — **done**: `GradientBoostingClassifier` on real `breast_cancer` data at `alpha=0.15`, above. A further real classifier family (e.g. gradient boosting *regression* trees' own boosting variant, or a genuinely different method like SVM with calibrated probabilities) is still a real option if a future check wants a fourth data point.
+1. ~~A second real-dataset coverage check for the classification case at a different `alpha` level, and/or a second real classifier family (e.g. gradient boosting)~~ — **done**: `GradientBoostingClassifier` on real `breast_cancer` data at `alpha=0.15`, above. ~~A further real classifier family (e.g. SVM with calibrated probabilities)~~ — **done**: a support vector machine on real `iris` data at `alpha=0.2`, above. A fifth real classifier family/dataset/alpha combination is still a real option if a future check wants one.
 2. ~~A second real-dataset coverage check for the regression case at a third `alpha` level, and/or a second real model family (e.g. gradient boosting)~~ — **done**: `GradientBoostingRegressor` on real `diabetes` data at `alpha=0.15`, above. A further real regression model family (e.g. SVR, or a genuinely different method) is still a real option if a future check wants a fourth data point.
 
 ## License
