@@ -11,4 +11,4 @@ from easyconform._conformalize import Conformalize, NotFittedError
 from easyconform._conformalize_classifier import ConformalizeClassifier
 
 __all__ = ["Conformalize", "ConformalizeClassifier", "NotFittedError"]
-__version__ = "0.2.4"
+__version__ = "0.2.5"
