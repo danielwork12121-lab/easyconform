@@ -222,10 +222,10 @@ above is rounded in the library's favor.
 
 Reproduce this yourself: `pytest tests/ -v` runs this exact check live
 (`test_real_random_forest_empirical_set_coverage_on_real_digits_data`),
-along with 10 other classification tests (hand-computed nonconformity-score
+along with 11 other classification tests (hand-computed nonconformity-score
 sanity checks, input-validation checks, a second real end-to-end check on
-sklearn's bundled `wine` dataset with a scaled `LogisticRegression`, and a
-third real check below).
+sklearn's bundled `wine` dataset with a scaled `LogisticRegression`, and
+third through sixth real checks below).
 
 ### A third real check: a different model family, dataset, and `alpha`
 
@@ -306,6 +306,30 @@ already applied to `SVR`/`SVM` above and to the instance-based `KNN`
 regression check. Reproduce via
 `test_real_mlp_empirical_set_coverage_on_real_digits_data_at_alpha_0_2`.
 
+### A sixth real check: a genuinely new model family, a reused dataset, and a new `alpha`
+
+A sixth real combination — `GaussianNB` (a generative, probabilistic
+method: fits a per-class Gaussian over each feature and applies Bayes'
+rule — neither a tree ensemble, a linear model, a margin-based method,
+nor a neural network, the first probabilistic/generative model family in
+this README) on sklearn's real, bundled `breast_cancer` dataset (569 real
+diagnostic measurements, binary malignant/benign — reused from the third
+check above, but never previously measured at any `alpha` other than
+0.15), at a genuinely new `alpha=0.1` for this dataset (a 90% coverage
+target) — measured on 171 real held-out test points:
+
+| Target coverage (`1 - alpha`) | Empirical coverage (measured) |
+|---|---|
+| 90% (`alpha=0.1`) | **89.47%** |
+
+Landing just under the nominal target, well within the real finite-sample
+slack at this sample size (a binomial standard error of roughly 2.3
+points at n=171 and a 90% target) — reported exactly as measured, not
+rounded up. `GaussianNB` needs no feature-scaling wrapper (it fits each
+feature's own per-class Gaussian independently) and exposes a real
+`predict_proba` natively, so it's used directly, unwrapped. Reproduce via
+`test_real_gaussian_nb_empirical_set_coverage_on_real_breast_cancer_data_at_alpha_0_1`.
+
 ## Installation
 
 Not yet published to PyPI. Until then:
@@ -358,7 +382,7 @@ covering both the regression (interval) and classification (set) cases.
 
 ## What's next
 
-1. ~~A second real-dataset coverage check for the classification case at a different `alpha` level, and/or a second real classifier family (e.g. gradient boosting)~~ — **done**: `GradientBoostingClassifier` on real `breast_cancer` data at `alpha=0.15`, above. ~~A further real classifier family (e.g. SVM with calibrated probabilities)~~ — **done**: a support vector machine on real `iris` data at `alpha=0.2`, above. ~~A fifth real classifier family/dataset/alpha combination~~ — **done**: `MLPClassifier` (a feedforward neural network, `StandardScaler`-wrapped) on real `digits` data at `alpha=0.2`, above. A sixth combination remains a real option if a future check wants one.
+1. ~~A second real-dataset coverage check for the classification case at a different `alpha` level, and/or a second real classifier family (e.g. gradient boosting)~~ — **done**: `GradientBoostingClassifier` on real `breast_cancer` data at `alpha=0.15`, above. ~~A further real classifier family (e.g. SVM with calibrated probabilities)~~ — **done**: a support vector machine on real `iris` data at `alpha=0.2`, above. ~~A fifth real classifier family/dataset/alpha combination~~ — **done**: `MLPClassifier` (a feedforward neural network, `StandardScaler`-wrapped) on real `digits` data at `alpha=0.2`, above. ~~A sixth real classifier family/dataset/alpha combination~~ — **done**: `GaussianNB` (a generative/probabilistic method, unwrapped) on real `breast_cancer` data at `alpha=0.1`, above. A seventh combination remains a real option if a future check wants one.
 2. ~~A second real-dataset coverage check for the regression case at a third `alpha` level, and/or a second real model family (e.g. gradient boosting)~~ — **done**: `GradientBoostingRegressor` on real `diabetes` data at `alpha=0.15`, above. ~~A further real regression model family (e.g. SVR, or a genuinely different method)~~ — **done**: `SVR` (margin-based, `StandardScaler`-wrapped) on real `california_housing` data at `alpha=0.2`, above. ~~A fifth real regression model family/dataset/alpha combination~~ — **done**: `KNeighborsRegressor` (`StandardScaler`-wrapped) on real `diabetes` data at `alpha=0.1`, above. ~~A sixth real regression model family/dataset/alpha combination~~ — **done**: `MLPRegressor` (`StandardScaler`-wrapped, `early_stopping=True`) on real `diabetes` data at `alpha=0.2`, above. A seventh combination remains a real option if a future check wants one.
 
 ## License
