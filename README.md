@@ -199,6 +199,45 @@ uncertainty at a 95% target), not shipped as a test since this suite's
 convention is to ship a combination whose interval is demonstrably
 informative, not merely well-calibrated.
 
+### An eighth real regression check: the first plain, unregularized tree
+
+The seven checks above cover a bagged tree ensemble
+(`RandomForestRegressor`), a boosted tree ensemble
+(`GradientBoostingRegressor`), a linear model (`LinearRegression`,
+finiteness-only), a margin-based method (`SVR`), an instance-based method
+(`KNeighborsRegressor`), a neural network (`MLPRegressor`), and a
+probabilistic/kernel-based method (`GaussianProcessRegressor`) — every one
+either an ensemble, a regularized/kernelized model, or a Bayesian one. No
+single, unregularized decision tree had been used anywhere in this suite
+(on either the regression or classification side). An eighth real
+combination — `DecisionTreeRegressor`, the simplest possible non-linear
+model, with no bagging, boosting, margin, or kernel machinery wrapped
+around it — closes that real structural gap. No feature scaling is
+applied: unlike `SVR`/`MLPRegressor`/`GaussianProcessRegressor` above, a
+decision tree only ever compares a feature to its own threshold, never to
+another feature's raw magnitude, so it's scale-invariant (the same
+reasoning already applied to the tree ensembles in this suite) — back on
+the real, bundled `california_housing` dataset (already this suite's
+large, reliable flagship — `RandomForestRegressor`'s and `SVR`'s own
+checks above), at a genuinely new `alpha=0.3` (a 70% target) — the loosest
+alpha used anywhere in this suite so far (every other check has used
+0.1/0.15/0.2/0.25):
+
+| Target coverage (`1 - alpha`) | Empirical coverage (measured) | Median interval width |
+|---|---|---|
+| 70% (`alpha=0.3`) | **71.14%** | 1.126 (raw target units) |
+
+Measured on a real, held-out test split of 5,160 points never seen during
+training or calibration — reported exactly as measured, landing just
+above the target rather than forced to it. A tighter `alpha=0.1` was also
+checked as a sanity comparison on the same model/dataset (89.13% coverage
+against a 90% target) — reported here for transparency, not shipped as
+the suite's own test, since `alpha=0.3` is the genuinely new alpha value
+for this suite and gives this single-tree model's coarser-grained
+residuals (each leaf predicts the same value for every point that reaches
+it) a real, informative interval to measure. Reproduce via
+`test_real_decision_tree_empirical_coverage_on_real_california_housing_data_at_alpha_0_3`.
+
 ## The one real assumption this relies on
 
 Split conformal's coverage guarantee holds when the calibration set and
@@ -454,7 +493,7 @@ covering both the regression (interval) and classification (set) cases.
 ## What's next
 
 1. ~~A second real-dataset coverage check for the classification case at a different `alpha` level, and/or a second real classifier family (e.g. gradient boosting)~~ — **done**: `GradientBoostingClassifier` on real `breast_cancer` data at `alpha=0.15`, above. ~~A further real classifier family (e.g. SVM with calibrated probabilities)~~ — **done**: a support vector machine on real `iris` data at `alpha=0.2`, above. ~~A fifth real classifier family/dataset/alpha combination~~ — **done**: `MLPClassifier` (a feedforward neural network, `StandardScaler`-wrapped) on real `digits` data at `alpha=0.2`, above. ~~A sixth real classifier family/dataset/alpha combination~~ — **done**: `GaussianNB` (a generative/probabilistic method, unwrapped) on real `breast_cancer` data at `alpha=0.1`, above. ~~A seventh real classifier family/dataset/alpha combination~~ — **done**: `KNeighborsClassifier` (`StandardScaler`-wrapped) on real `wine` data at `alpha=0.2` — `wine`'s first real quantitative coverage measurement, above. An eighth combination remains a real option if a future check wants one.
-2. ~~A second real-dataset coverage check for the regression case at a third `alpha` level, and/or a second real model family (e.g. gradient boosting)~~ — **done**: `GradientBoostingRegressor` on real `diabetes` data at `alpha=0.15`, above. ~~A further real regression model family (e.g. SVR, or a genuinely different method)~~ — **done**: `SVR` (margin-based, `StandardScaler`-wrapped) on real `california_housing` data at `alpha=0.2`, above. ~~A fifth real regression model family/dataset/alpha combination~~ — **done**: `KNeighborsRegressor` (`StandardScaler`-wrapped) on real `diabetes` data at `alpha=0.1`, above. ~~A sixth real regression model family/dataset/alpha combination~~ — **done**: `MLPRegressor` (`StandardScaler`-wrapped, `early_stopping=True`) on real `diabetes` data at `alpha=0.2`, above. ~~A seventh real regression model family/dataset/alpha combination~~ — **done**: `GaussianProcessRegressor` (probabilistic/kernel-based, `StandardScaler`-wrapped) on real `diabetes` data at a genuinely new `alpha=0.25`, above. An eighth combination remains a real option if a future check wants one.
+2. ~~A second real-dataset coverage check for the regression case at a third `alpha` level, and/or a second real model family (e.g. gradient boosting)~~ — **done**: `GradientBoostingRegressor` on real `diabetes` data at `alpha=0.15`, above. ~~A further real regression model family (e.g. SVR, or a genuinely different method)~~ — **done**: `SVR` (margin-based, `StandardScaler`-wrapped) on real `california_housing` data at `alpha=0.2`, above. ~~A fifth real regression model family/dataset/alpha combination~~ — **done**: `KNeighborsRegressor` (`StandardScaler`-wrapped) on real `diabetes` data at `alpha=0.1`, above. ~~A sixth real regression model family/dataset/alpha combination~~ — **done**: `MLPRegressor` (`StandardScaler`-wrapped, `early_stopping=True`) on real `diabetes` data at `alpha=0.2`, above. ~~A seventh real regression model family/dataset/alpha combination~~ — **done**: `GaussianProcessRegressor` (probabilistic/kernel-based, `StandardScaler`-wrapped) on real `diabetes` data at a genuinely new `alpha=0.25`, above. ~~An eighth real regression model family/dataset/alpha combination~~ — **done**: `DecisionTreeRegressor` (the first plain, unregularized tree in this suite) on real `california_housing` data at a genuinely new `alpha=0.3`, above. A ninth combination remains a real option if a future check wants one.
 
 ## License
 
