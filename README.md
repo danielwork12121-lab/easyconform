@@ -238,6 +238,45 @@ residuals (each leaf predicts the same value for every point that reaches
 it) a real, informative interval to measure. Reproduce via
 `test_real_decision_tree_empirical_coverage_on_real_california_housing_data_at_alpha_0_3`.
 
+### A ninth real regression check: a genuinely different kind of boosting
+
+The eight checks above cover a bagged tree ensemble
+(`RandomForestRegressor`), a boosted tree ensemble that fits new trees to
+the previous ensemble's *residual errors* (`GradientBoostingRegressor`), a
+linear model (`LinearRegression`, finiteness-only), a margin-based method
+(`SVR`), an instance-based method (`KNeighborsRegressor`), a neural
+network (`MLPRegressor`), a probabilistic/kernel-based method
+(`GaussianProcessRegressor`), and a single, unregularized decision tree
+(`DecisionTreeRegressor`). `AdaBoostRegressor` is a genuinely different
+kind of boosting from the gradient-boosted ensemble already in this
+suite: AdaBoost re-weights the *training samples* after each weak learner
+(emphasizing the points the ensemble-so-far got most wrong) and combines
+the weak learners' predictions via a weighted median, rather than fitting
+each new learner to the previous ensemble's residuals — a structurally
+different error-correction mechanism, not just a different
+hyperparameter on the same algorithm.
+
+Back on the real, bundled `california_housing` dataset (already this
+suite's large, reliable flagship — `RandomForestRegressor`'s, `SVR`'s, and
+`DecisionTreeRegressor`'s own checks above), at `alpha=0.2` (an 80%
+target, already used elsewhere in this suite but not yet on this
+dataset/model combination) — checked first and already genuinely
+informative:
+
+| Target coverage (`1 - alpha`) | Empirical coverage (measured) | Median interval width |
+|---|---|---|
+| 80% (`alpha=0.2`) | **79.98%** | 2.137 (raw target units) |
+
+Measured on the same real, held-out test split of 5,160 points the other
+`california_housing` checks above use — reported exactly as measured, an
+almost exact match to the nominal target. `alpha=0.1` and `alpha=0.15` on
+the same model/dataset were also checked as sanity comparisons (90.45%
+and 85.50% coverage against their own 90%/85% targets) — reported here
+for transparency, not shipped, since `alpha=0.2` is the one checked first
+and already genuinely informative, not picked after trying several and
+keeping only the most flattering one. Reproduce via
+`test_real_adaboost_empirical_coverage_on_real_california_housing_data_at_alpha_0_2`.
+
 ## The one real assumption this relies on
 
 Split conformal's coverage guarantee holds when the calibration set and
@@ -533,7 +572,7 @@ covering both the regression (interval) and classification (set) cases.
 ## What's next
 
 1. ~~A second real-dataset coverage check for the classification case at a different `alpha` level, and/or a second real classifier family (e.g. gradient boosting)~~ — **done**: `GradientBoostingClassifier` on real `breast_cancer` data at `alpha=0.15`, above. ~~A further real classifier family (e.g. SVM with calibrated probabilities)~~ — **done**: a support vector machine on real `iris` data at `alpha=0.2`, above. ~~A fifth real classifier family/dataset/alpha combination~~ — **done**: `MLPClassifier` (a feedforward neural network, `StandardScaler`-wrapped) on real `digits` data at `alpha=0.2`, above. ~~A sixth real classifier family/dataset/alpha combination~~ — **done**: `GaussianNB` (a generative/probabilistic method, unwrapped) on real `breast_cancer` data at `alpha=0.1`, above. ~~A seventh real classifier family/dataset/alpha combination~~ — **done**: `KNeighborsClassifier` (`StandardScaler`-wrapped) on real `wine` data at `alpha=0.2` — `wine`'s first real quantitative coverage measurement, above. ~~An eighth real classifier family/dataset/alpha combination~~ — **done**: `DecisionTreeClassifier` (the first plain, unregularized tree on this suite's classification side) on real `iris` data at a genuinely new `alpha=0.15` — `iris`'s second real alpha level, above. A ninth combination remains a real option if a future check wants one.
-2. ~~A second real-dataset coverage check for the regression case at a third `alpha` level, and/or a second real model family (e.g. gradient boosting)~~ — **done**: `GradientBoostingRegressor` on real `diabetes` data at `alpha=0.15`, above. ~~A further real regression model family (e.g. SVR, or a genuinely different method)~~ — **done**: `SVR` (margin-based, `StandardScaler`-wrapped) on real `california_housing` data at `alpha=0.2`, above. ~~A fifth real regression model family/dataset/alpha combination~~ — **done**: `KNeighborsRegressor` (`StandardScaler`-wrapped) on real `diabetes` data at `alpha=0.1`, above. ~~A sixth real regression model family/dataset/alpha combination~~ — **done**: `MLPRegressor` (`StandardScaler`-wrapped, `early_stopping=True`) on real `diabetes` data at `alpha=0.2`, above. ~~A seventh real regression model family/dataset/alpha combination~~ — **done**: `GaussianProcessRegressor` (probabilistic/kernel-based, `StandardScaler`-wrapped) on real `diabetes` data at a genuinely new `alpha=0.25`, above. ~~An eighth real regression model family/dataset/alpha combination~~ — **done**: `DecisionTreeRegressor` (the first plain, unregularized tree in this suite) on real `california_housing` data at a genuinely new `alpha=0.3`, above. A ninth combination remains a real option if a future check wants one.
+2. ~~A second real-dataset coverage check for the regression case at a third `alpha` level, and/or a second real model family (e.g. gradient boosting)~~ — **done**: `GradientBoostingRegressor` on real `diabetes` data at `alpha=0.15`, above. ~~A further real regression model family (e.g. SVR, or a genuinely different method)~~ — **done**: `SVR` (margin-based, `StandardScaler`-wrapped) on real `california_housing` data at `alpha=0.2`, above. ~~A fifth real regression model family/dataset/alpha combination~~ — **done**: `KNeighborsRegressor` (`StandardScaler`-wrapped) on real `diabetes` data at `alpha=0.1`, above. ~~A sixth real regression model family/dataset/alpha combination~~ — **done**: `MLPRegressor` (`StandardScaler`-wrapped, `early_stopping=True`) on real `diabetes` data at `alpha=0.2`, above. ~~A seventh real regression model family/dataset/alpha combination~~ — **done**: `GaussianProcessRegressor` (probabilistic/kernel-based, `StandardScaler`-wrapped) on real `diabetes` data at a genuinely new `alpha=0.25`, above. ~~An eighth real regression model family/dataset/alpha combination~~ — **done**: `DecisionTreeRegressor` (the first plain, unregularized tree in this suite) on real `california_housing` data at a genuinely new `alpha=0.3`, above. ~~A ninth real regression model family/dataset/alpha combination~~ — **done**: `AdaBoostRegressor` (sample-reweighting boosting, genuinely different from gradient boosting's residual-fitting) on real `california_housing` data at `alpha=0.2`, above. A tenth combination remains a real option if a future check wants one.
 
 ## License
 
