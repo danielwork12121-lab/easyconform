@@ -519,6 +519,45 @@ sets — not a trivial full-set collapse like the `alpha=0.1` trial above.
 Reproduce via
 `test_real_decision_tree_empirical_set_coverage_on_real_iris_data_at_alpha_0_15`.
 
+### A ninth real check: a probabilistic/kernel-based method, and `digits`'s third real `alpha`
+
+The eight checks above cover a bagged tree ensemble
+(`RandomForestClassifier`), a linear model (`LogisticRegression`,
+qualitative only), a boosted tree ensemble (`GradientBoostingClassifier`),
+a margin-based method (`SVM`), a neural network (`MLPClassifier`), a
+generative/probabilistic method (`GaussianNB`), an instance-based method
+(`KNeighborsClassifier`), and a plain decision tree
+(`DecisionTreeClassifier`) — no probabilistic/kernel-based method had been
+used anywhere on this suite's classification side. A ninth real
+combination — `GaussianProcessClassifier`, `StandardScaler`-wrapped via
+`make_pipeline` — closes that real structural gap, mirroring
+`GaussianProcessRegressor`'s own role on this library's regression side.
+
+Measured on sklearn's real, bundled `digits` dataset (1,797 real 8×8
+handwritten-digit images, ten real classes) — reused from the
+`RandomForestClassifier`/`MLPClassifier` checks above, but at a genuinely
+new `alpha=0.25` (a 75% coverage target): `digits` had only ever been
+paired with `alpha=0.1` and `alpha=0.2` before. An honest search before
+choosing this combination: `GaussianProcessClassifier` on `iris` at
+`alpha=0.1` gave 91.11% coverage against a 90% target (n=45, genuinely
+informative) and on `wine` at `alpha=0.15` gave 92.59% against an 85%
+target (n=54, also genuinely informative) — both real and usable, but
+`digits`+`alpha=0.25` was chosen instead because it closes two things at
+once (a new model family *and* a new `alpha` level for `digits`) and has
+the largest real held-out test set of the three — measured on 540 real
+held-out test points:
+
+| Target coverage (`1 - alpha`) | Empirical coverage (measured) |
+|---|---|
+| 75% (`alpha=0.25`) | **78.15%** |
+
+Landing close to the nominal target. Mean prediction-set size came in at
+0.791 (below 1.0 — some real test points got an empty conformal set, a
+legitimate outcome of this method's own non-conformity score on a
+ten-class problem, not a bug), reported here exactly as measured, same
+discipline as every other check above. Reproduce via
+`test_real_gaussian_process_empirical_set_coverage_on_real_digits_data_at_alpha_0_25`.
+
 ## Installation
 
 Not yet published to PyPI. Until then:
@@ -571,10 +610,9 @@ covering both the regression (interval) and classification (set) cases.
 
 ## What's next
 
-1. ~~A second real-dataset coverage check for the classification case at a different `alpha` level, and/or a second real classifier family (e.g. gradient boosting)~~ — **done**: `GradientBoostingClassifier` on real `breast_cancer` data at `alpha=0.15`, above. ~~A further real classifier family (e.g. SVM with calibrated probabilities)~~ — **done**: a support vector machine on real `iris` data at `alpha=0.2`, above. ~~A fifth real classifier family/dataset/alpha combination~~ — **done**: `MLPClassifier` (a feedforward neural network, `StandardScaler`-wrapped) on real `digits` data at `alpha=0.2`, above. ~~A sixth real classifier family/dataset/alpha combination~~ — **done**: `GaussianNB` (a generative/probabilistic method, unwrapped) on real `breast_cancer` data at `alpha=0.1`, above. ~~A seventh real classifier family/dataset/alpha combination~~ — **done**: `KNeighborsClassifier` (`StandardScaler`-wrapped) on real `wine` data at `alpha=0.2` — `wine`'s first real quantitative coverage measurement, above. ~~An eighth real classifier family/dataset/alpha combination~~ — **done**: `DecisionTreeClassifier` (the first plain, unregularized tree on this suite's classification side) on real `iris` data at a genuinely new `alpha=0.15` — `iris`'s second real alpha level, above. A ninth combination remains a real option if a future check wants one.
+1. ~~A second real-dataset coverage check for the classification case at a different `alpha` level, and/or a second real classifier family (e.g. gradient boosting)~~ — **done**: `GradientBoostingClassifier` on real `breast_cancer` data at `alpha=0.15`, above. ~~A further real classifier family (e.g. SVM with calibrated probabilities)~~ — **done**: a support vector machine on real `iris` data at `alpha=0.2`, above. ~~A fifth real classifier family/dataset/alpha combination~~ — **done**: `MLPClassifier` (a feedforward neural network, `StandardScaler`-wrapped) on real `digits` data at `alpha=0.2`, above. ~~A sixth real classifier family/dataset/alpha combination~~ — **done**: `GaussianNB` (a generative/probabilistic method, unwrapped) on real `breast_cancer` data at `alpha=0.1`, above. ~~A seventh real classifier family/dataset/alpha combination~~ — **done**: `KNeighborsClassifier` (`StandardScaler`-wrapped) on real `wine` data at `alpha=0.2` — `wine`'s first real quantitative coverage measurement, above. ~~An eighth real classifier family/dataset/alpha combination~~ — **done**: `DecisionTreeClassifier` (the first plain, unregularized tree on this suite's classification side) on real `iris` data at a genuinely new `alpha=0.15` — `iris`'s second real alpha level, above. ~~A ninth real classifier family/dataset/alpha combination~~ — **done**: `GaussianProcessClassifier` (a probabilistic/kernel-based method, `StandardScaler`-wrapped, mirroring `GaussianProcessRegressor`'s own role on the regression side) on real `digits` data at a genuinely new `alpha=0.25` — `digits`'s third real alpha level, above. A tenth combination remains a real option if a future check wants one.
 2. ~~A second real-dataset coverage check for the regression case at a third `alpha` level, and/or a second real model family (e.g. gradient boosting)~~ — **done**: `GradientBoostingRegressor` on real `diabetes` data at `alpha=0.15`, above. ~~A further real regression model family (e.g. SVR, or a genuinely different method)~~ — **done**: `SVR` (margin-based, `StandardScaler`-wrapped) on real `california_housing` data at `alpha=0.2`, above. ~~A fifth real regression model family/dataset/alpha combination~~ — **done**: `KNeighborsRegressor` (`StandardScaler`-wrapped) on real `diabetes` data at `alpha=0.1`, above. ~~A sixth real regression model family/dataset/alpha combination~~ — **done**: `MLPRegressor` (`StandardScaler`-wrapped, `early_stopping=True`) on real `diabetes` data at `alpha=0.2`, above. ~~A seventh real regression model family/dataset/alpha combination~~ — **done**: `GaussianProcessRegressor` (probabilistic/kernel-based, `StandardScaler`-wrapped) on real `diabetes` data at a genuinely new `alpha=0.25`, above. ~~An eighth real regression model family/dataset/alpha combination~~ — **done**: `DecisionTreeRegressor` (the first plain, unregularized tree in this suite) on real `california_housing` data at a genuinely new `alpha=0.3`, above. ~~A ninth real regression model family/dataset/alpha combination~~ — **done**: `AdaBoostRegressor` (sample-reweighting boosting, genuinely different from gradient boosting's residual-fitting) on real `california_housing` data at `alpha=0.2`, above. A tenth combination remains a real option if a future check wants one.
 
 ## License
 
 MIT — see `LICENSE`.
-   
